@@ -58,7 +58,7 @@
             <!-- small box -->
             <div class="small-box bg-danger">
                 <div class="inner">
-                    <h3>KSh {{ number_format($monthlyRevenue, 2) }}</h3>
+                    <h3 class="money-figure">KSh {{ number_format($monthlyRevenue, 0) }}</h3>
                     <p>Monthly Revenue</p>
                 </div>
                 <div class="icon">
@@ -100,7 +100,7 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-dark">
                 <div class="inner">
-                    <h3>KSh {{ number_format($totalArrears ?? 0, 2) }}</h3>
+                    <h3 class="money-figure">KSh {{ number_format($totalArrears ?? 0, 0) }}</h3>
                     <p>Total Arrears</p>
                 </div>
                 <div class="icon">
@@ -158,7 +158,9 @@
                     <h3 class="card-title">Recent Payments</h3>
                 </div>
                 <!-- /.card-header -->
-                <div class="card-body p-0">
+                
+                <!-- Desktop Table View (hidden on mobile) -->
+                <div class="card-body p-0 d-none d-md-block">
                     @if($recentPayments->count() > 0)
                         <table class="table table-striped">
                             <thead>
@@ -187,7 +189,7 @@
                                             <span class="text-muted">N/A</span>
                                         @endif
                                     </td>
-                                    <td>KSh {{ number_format($payment->amount, 2) }}</td>
+                                    <td><span class="money-figure">KSh {{ number_format($payment->amount, 0) }}</span></td>
                                     <td>{{ $payment->payment_date->format('M d, Y') }}</td>
                                     <td>
                                         <span class="badge badge-{{ $payment->status == 'completed' ? 'success' : ($payment->status == 'pending' ? 'warning' : 'danger') }}">
@@ -206,9 +208,59 @@
                     @endif
                 </div>
                 <!-- /.card-body -->
+
+                <!-- Mobile Card View (visible only on mobile) -->
+                <div class="card-body d-md-none">
+                    @if($recentPayments->count() > 0)
+                        <div class="row">
+                            @foreach($recentPayments as $payment)
+                            <div class="col-12 mb-3">
+                                <div class="card payment-card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-8">
+                                                <h6 class="card-title mb-1">
+                                                    {{ $payment->tenant->name ?? 'N/A' }}
+                                                </h6>
+                                                <p class="card-text mb-1 text-muted small">
+                                                    {{ $payment->property->name ?? 'N/A' }}
+                                                </p>
+                                                <p class="card-text mb-1">
+                                                    <strong class="money-figure">KSh {{ number_format($payment->amount, 0) }}</strong>
+                                                </p>
+                                                <p class="card-text mb-0">
+                                                    <small class="text-muted">{{ $payment->payment_date->format('M d, Y') }}</small>
+                                                </p>
+                                            </div>
+                                            <div class="col-4 text-right">
+                                                <span class="badge badge-{{ $payment->status == 'completed' ? 'success' : ($payment->status == 'pending' ? 'warning' : 'danger') }}">
+                                                    {{ ucfirst($payment->status) }}
+                                                </span>
+                                                <br>
+                                                <small class="text-muted mt-2 d-block">
+                                                    {{ ucfirst($payment->type) }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <i class="fas fa-receipt fa-2x text-muted mb-2"></i>
+                            <p class="text-muted">No recent payments found</p>
+                        </div>
+                    @endif
+                </div>
+                <!-- /.mobile card body -->
+
                 @if($recentPayments->count() > 0)
                 <div class="card-footer text-center">
-                    <a href="{{ route('payments.index') }}" class="uppercase">View All Payments</a>
+                    <a href="{{ route('payments.index') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-list"></i> View All Payments
+                    </a>
                 </div>
                 @endif
                 <!-- /.card-footer -->
@@ -270,13 +322,13 @@
                         <div class="col-6">
                             <a href="{{ route('tenants.create') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-user-plus"></i><br>
-                                Add Tenant
+                                <small>Add Tenant</small>
                             </a>
                         </div>
                         <div class="col-6">
                             <a href="{{ route('payments.create') }}" class="btn btn-success btn-block">
                                 <i class="fas fa-money-bill-wave"></i><br>
-                                Record Payment
+                                <small>Record Payment</small>
                             </a>
                         </div>
                     </div>
@@ -284,13 +336,13 @@
                         <div class="col-6">
                             <a href="{{ route('properties.create') }}" class="btn btn-info btn-block">
                                 <i class="fas fa-building"></i><br>
-                                Add Property
+                                <small>Add Property</small>
                             </a>
                         </div>
                         <div class="col-6">
                             <a href="{{ route('reports.rent') }}" class="btn btn-warning btn-block">
                                 <i class="fas fa-chart-bar"></i><br>
-                                View Reports
+                                <small>View Reports</small>
                             </a>
                         </div>
                     </div>
@@ -323,7 +375,7 @@
                         <div class="list-group-item d-flex justify-content-between align-items-center">
                             Monthly Revenue
                             <span class="badge badge-{{ $monthlyRevenue > 0 ? 'success' : 'warning' }} badge-pill">
-                                KSh {{ number_format($monthlyRevenue, 0) }}
+                                <span class="money-figure">KSh {{ number_format($monthlyRevenue, 0) }}</span>
                             </span>
                         </div>
                     </div>
@@ -384,4 +436,59 @@
         @endif
     });
 </script>
+
+<style>
+    /* Smaller font size for money figures */
+    .money-figure {
+        font-size: 0.9em;
+        font-weight: 600;
+    }
+    
+    /* Mobile payment cards styling */
+    .payment-card {
+        border-left: 4px solid #007bff;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .payment-card .card-body {
+        padding: 12px;
+    }
+    
+    .payment-card .card-title {
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+    }
+    
+    .payment-card .card-text {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+    }
+    
+    /* Responsive adjustments for small boxes */
+    @media (max-width: 576px) {
+        .small-box .inner h3 {
+            font-size: 1.8rem;
+        }
+        
+        .small-box .inner h3.money-figure {
+            font-size: 1.5rem;
+        }
+        
+        .progress-group {
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Badge adjustments for mobile */
+    @media (max-width: 768px) {
+        .badge {
+            font-size: 0.7rem;
+        }
+    }
+</style>
 @endsection
