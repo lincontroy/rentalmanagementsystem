@@ -58,7 +58,7 @@
             <!-- small box -->
             <div class="small-box bg-danger">
                 <div class="inner">
-                    <h3 class="money-figure">KSh {{ number_format($monthlyRevenue, 0) }}</h3>
+                    <h5 class="money-figure">KSh {{ number_format($monthlyRevenue, 0) }}</h5>
                     <p>Monthly Revenue</p>
                 </div>
                 <div class="icon">
@@ -100,7 +100,7 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-dark">
                 <div class="inner">
-                    <h3 class="money-figure">KSh {{ number_format($totalArrears ?? 0, 0) }}</h3>
+                    <h5 class="money-figure">KSh {{ number_format($totalArrears ?? 0, 0) }}</h5>
                     <p>Total Arrears</p>
                 </div>
                 <div class="icon">
